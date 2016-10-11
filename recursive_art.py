@@ -1,5 +1,6 @@
 """ TODO: Put your header comment here """
 
+from math import *
 import random
 from PIL import Image
 
@@ -15,11 +16,19 @@ def build_random_function(min_depth, max_depth):
                  (see assignment writeup for details on the representation of
                  these functions)
     """
-    # TODO: implement this
-    pass
+    func_list = ["prod","avg","cos_pi","sin_pi","x","y","ycos_10","xcos_10"]
+    index = random.randint(0,len(func_list)-1)
+    func = func_list[index]
+
+    if min_depth > 1:
+        depth = random.randint(min_depth,max_depth)
+        func2 = build_random_function(depth-1,depth-1)
+        return [func,func2,func2]
+    else:
+        return [func]
 
 
-def evaluate_random_function(f, x, y):
+def evaluate_random_function(f, a, b):
     """ Evaluate the random function f with inputs x,y
         Representation of the function f is defined in the assignment writeup
 
@@ -32,9 +41,39 @@ def evaluate_random_function(f, x, y):
         -0.5
         >>> evaluate_random_function(["y"],0.1,0.02)
         0.02
+        >>> evaluate_random_function(['cos_pi',['cos_pi'],['cos_pi']],.5,.5)
+        1.0
+        >>> evaluate_random_function(['sin_pi',['x',['avg',['prod'],['prod']],['avg',['prod'],['prod']]],['x',['avg',['prod'],['prod']],['avg',['prod'],['prod']]]],0,0)
+        0.0
     """
-    # TODO: implement this
-    pass
+    res = 0
+    if len(f)>1:
+        res1 = evaluate_random_function(f[1],a,b)
+        res2 = evaluate_random_function(f[2],a,b)
+        f = [f[0]]
+        a = res1
+        b = res2
+
+    if f==["prod"]:
+        res = a*b
+    elif f==["avg"]:
+        res =  0.5*(a+b)
+    elif f==["cos_pi"]:
+        res = cos(pi*a)
+    elif f==["sin_pi"]:
+        res = sin(pi*a)
+    elif f==["x"]:
+        res = a
+    elif f==["y"]:
+        res = b
+    elif f==["ycos_10"]:
+        res = cos(10*b)
+    elif f==["xcos_10"]:
+        res = cos(10*a)
+    return res
+
+    # Notes: including abs(a) and e^(a-1) got a plaid pattern. I want more rotationally symmetric
+    # things, so I think I need to apply the functions to both a and b
 
 
 def remap_interval(val,
@@ -64,8 +103,8 @@ def remap_interval(val,
         >>> remap_interval(5, 4, 6, 1, 2)
         1.5
     """
-    # TODO: implement this
-    pass
+    res = output_interval_start+(1.0*(val-input_interval_start)*(output_interval_end-output_interval_start)/(input_interval_end-input_interval_start))
+    return res
 
 
 def color_map(val):
@@ -89,6 +128,7 @@ def color_map(val):
     return int(color_code)
 
 
+### Ignore this, was used for testing
 def test_image(filename, x_size=350, y_size=350):
     """ Generate test image with random pixels and save as an image file.
 
@@ -107,7 +147,7 @@ def test_image(filename, x_size=350, y_size=350):
                             random.randint(0, 255))  # Blue channel
 
     im.save(filename)
-
+###
 
 def generate_art(filename, x_size=350, y_size=350):
     """ Generate computational art and save as an image file.
@@ -116,9 +156,9 @@ def generate_art(filename, x_size=350, y_size=350):
         x_size, y_size: optional args to set image dimensions (default: 350)
     """
     # Functions for red, green, and blue channels - where the magic happens!
-    red_function = ["x"]
-    green_function = ["y"]
-    blue_function = ["x"]
+    red_function = build_random_function(7,9) #["x"]
+    green_function = build_random_function(7,9) #["y"]
+    blue_function = build_random_function(7,9) #["x"]
 
     # Create image and loop over all pixels
     im = Image.new("RGB", (x_size, y_size))
@@ -139,12 +179,5 @@ def generate_art(filename, x_size=350, y_size=350):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-
-    # Create some computational art!
-    # TODO: Un-comment the generate_art function call after you
-    #       implement remap_interval and evaluate_random_function
-    # generate_art("myart.png")
-
-    # Test that PIL is installed correctly
-    # TODO: Comment or remove this function call after testing PIL install
-    test_image("noise.png")
+    generate_art("test6.png")
+    # test_image("noise.png")
