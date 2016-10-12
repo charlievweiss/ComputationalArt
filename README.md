@@ -1,2 +1,2 @@
 # ComputationalArt
-This is the base repository for the computational art mini project.
+This is Charlie Weiss' copy of the computational art project.
